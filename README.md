@@ -1,59 +1,116 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <a href="https://laravel.com" target="_blank">
+    <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
+  </a>
 </p>
 
-## About Laravel
+# 📊 Catatan Penjualan – Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Aplikasi **Catatan Penjualan** berbasis **Laravel** untuk mencatat transaksi penjualan **multi-item**, pembayaran bertahap (**cicilan**), serta **dashboard ringkasan penjualan**.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Project ini dibuat sebagai **tes kemampuan backend**, dengan fokus pada:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   Logika bisnis
+-   Relasi database
+-   Konsistensi dan validasi data
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🚀 Fitur Utama
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🧾 Penjualan
 
-## Laravel Sponsors
+-   Tambah penjualan dengan **multi item**
+-   Qty, harga, subtotal, dan total dihitung otomatis
+-   Edit penjualan (**selama belum lunas**)
+-   Detail penjualan (item & riwayat pembayaran)
+-   Status otomatis:
+    -   `BELUM_DIBAYAR`
+    -   `BELUM_DIBAYAR_SEPENUHNYA`
+    -   `SUDAH_DIBAYAR`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+### 💰 Pembayaran
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+-   Pembayaran bertahap (cicilan)
+-   Validasi **pembayaran tidak boleh melebihi total penjualan**
+-   Edit pembayaran dengan update status otomatis
+-   Detail pembayaran
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 📈 Dashboard
 
-## Code of Conduct
+-   Jumlah transaksi
+-   Total penjualan
+-   Total qty
+-   Filter berdasarkan tanggal
+-   Chart ringkasan penjualan
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 🛠️ Teknologi yang Digunakan
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+-   **Laravel**
+-   **MySQL**
+-   **Bootstrap 5**
+-   **JavaScript (Vanilla)**
+-   **Chart.js**
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🗂️ Struktur Database (Ringkas)
+
+### Tabel
+
+-   `items`
+-   `sales`
+-   `sale_items`
+-   `payments`
+
+### Relasi Utama
+
+-   `Sale` hasMany `SaleItem`
+-   `Sale` hasMany `Payment`
+-   `SaleItem` belongsTo `Item`
+
+---
+
+## 🧪 Alur Pengujian Aplikasi
+
+### 1️⃣ Dashboard
+
+-   Cek ringkasan (awal data masih 0)
+
+### 2️⃣ Penjualan
+
+-   Menu **Penjualan** → **Tambah Penjualan**
+-   Pilih item, ubah qty, tambah item
+-   Simpan penjualan
+
+### 3️⃣ Pembayaran
+
+-   Menu **Pembayaran** → **Tambah Pembayaran**
+-   Lakukan pembayaran sebagian → status berubah
+-   Lakukan pembayaran penuh → status menjadi `SUDAH_DIBAYAR`
+
+### 4️⃣ Validasi
+
+-   Pembayaran melebihi total → **ditolak**
+-   Penjualan yang sudah lunas → **tidak bisa diedit / dihapus**
+
+---
+
+## 📌 Catatan
+
+-   Fokus utama project ini adalah **logika backend dan konsistensi data**
+-   Tidak menggunakan autentikasi user
+-   UI dibuat sederhana menggunakan **Bootstrap**
+
+---
+
+## 👨‍💻 Author
+
+**David Gholi Rahmadana**  
+Backend Developer – Laravel
