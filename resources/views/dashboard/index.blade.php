@@ -16,17 +16,29 @@
     </form>
 
     <div class="row text-center mb-4">
-        <div class="col">
-            <h5>Jumlah Transaksi</h5>
-            <h3>{{ $totalTransaksi }}</h3>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Jumlah Transaksi</h6>
+                    <h3>{{ $totalTransaksi }}</h3>
+                </div>
+            </div>
         </div>
-        <div class="col">
-            <h5>Total Penjualan</h5>
-            <h3>Rp {{ number_format($totalPenjualan) }}</h3>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Penjualan</h6>
+                    <h3>Rp {{ number_format($totalPenjualan) }}</h3>
+                </div>
+            </div>
         </div>
-        <div class="col">
-            <h5>Total Qty</h5>
-            <h3>{{ $totalQty }}</h3>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Qty</h6>
+                    <h3>{{ $totalQty }}</h3>
+                </div>
+            </div>
         </div>
     </div>
 

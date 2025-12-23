@@ -65,7 +65,9 @@ class SaleController extends Controller
     public function edit(Sale $sale)
     {
         if ($sale->status === 'SUDAH_DIBAYAR') {
-            abort(403, 'Penjualan sudah dibayar');
+            return redirect()
+                ->route('sales.index')
+                ->with('error', 'Penjualan sudah dibayar dan tidak bisa diedit');
         }
 
         $items = Item::all();
@@ -76,12 +78,16 @@ class SaleController extends Controller
     public function update(Request $request, Sale $sale)
     {
         if ($sale->status === 'SUDAH_DIBAYAR') {
-            abort(403);
+            return redirect()
+                ->route('sales.index')
+                ->with('error', 'Penjualan sudah dibayar dan tidak bisa diedit');
         }
 
         DB::transaction(function () use ($request, $sale) {
 
+            // hapus detail lama
             $sale->items()->delete();
+
             $total = 0;
 
             foreach ($request->items as $row) {
@@ -98,10 +104,13 @@ class SaleController extends Controller
                 $total += $subtotal;
             }
 
-            $sale->update(['total_amount' => $total]);
+            $sale->update([
+                'total_amount' => $total
+            ]);
         });
 
-        return redirect()->route('sales.index')
+        return redirect()
+            ->route('sales.index')
             ->with('success', 'Penjualan berhasil diupdate');
     }
 

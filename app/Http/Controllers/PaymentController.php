@@ -33,33 +33,31 @@ class PaymentController extends Controller
     {
         $sale = Sale::findOrFail($request->sale_id);
 
-        DB::transaction(function () use ($request, $sale) {
+        $totalPaid = $sale->payments()->sum('amount');
 
-            $totalPaid = $sale->payments()->sum('amount');
+        if ($totalPaid + $request->amount > $sale->total_amount) {
+            return back()
+                ->withInput()
+                ->with('error', 'Nominal pembayaran melebihi total penjualan');
+        }
 
-            // VALIDASI: tidak boleh bayar lebih
-            if ($totalPaid + $request->amount > $sale->total_amount) {
-                abort(422, 'Pembayaran melebihi total penjualan');
-            }
+        Payment::create([
+            'payment_code' => 'PAY-' . date('Ymd') . '-' . rand(1000, 9999),
+            'sale_id' => $sale->id,
+            'payment_date' => now(),
+            'amount' => $request->amount
+        ]);
 
-            Payment::create([
-                'payment_code' => 'PAY-' . date('Ymd') . '-' . rand(1000, 9999),
-                'sale_id' => $sale->id,
-                'payment_date' => now(),
-                'amount' => $request->amount
-            ]);
-
-            $newTotal = $sale->payments()->sum('amount');
-
-            if ($newTotal == $sale->total_amount) {
-                $sale->update(['status' => 'SUDAH_DIBAYAR']);
-            } else {
-                $sale->update(['status' => 'BELUM_DIBAYAR_SEPENUHNYA']);
-            }
-        });
+        // update status
+        $newTotal = $sale->payments()->sum('amount');
+        $sale->update([
+            'status' => $newTotal == $sale->total_amount
+                ? 'SUDAH_DIBAYAR'
+                : 'BELUM_DIBAYAR_SEPENUHNYA'
+        ]);
 
         return redirect()->route('payments.index')
-            ->with('success', 'Pembayaran berhasil');
+            ->with('success', 'Pembayaran berhasil disimpan');
     }
 
     public function show(Payment $payment)
@@ -75,35 +73,36 @@ class PaymentController extends Controller
 
     public function update(Request $request, Payment $payment)
     {
-        DB::transaction(function () use ($request, $payment) {
+        $sale = $payment->sale;
 
-            $sale = $payment->sale;
+        $otherPayments = $sale->payments()
+            ->where('id', '!=', $payment->id)
+            ->sum('amount');
 
-            // total selain payment ini
-            $otherPayments = $sale->payments()
-                ->where('id', '!=', $payment->id)
-                ->sum('amount');
+        if ($otherPayments + $request->amount > $sale->total_amount) {
+            return back()
+                ->withInput()
+                ->with('error', 'Nominal pembayaran melebihi total penjualan');
+        }
 
-            if ($otherPayments + $request->amount > $sale->total_amount) {
-                abort(422, 'Pembayaran melebihi total penjualan');
-            }
+        $payment->update([
+            'amount' => $request->amount
+        ]);
 
-            $payment->update([
-                'amount' => $request->amount
-            ]);
+        $totalPaid = $sale->payments()->sum('amount');
 
-            $newTotal = $sale->payments()->sum('amount');
-
-            if ($newTotal == $sale->total_amount) {
-                $sale->update(['status' => 'SUDAH_DIBAYAR']);
-            } else {
-                $sale->update(['status' => 'BELUM_DIBAYAR_SEPENUHNYA']);
-            }
-        });
+        if ($totalPaid == 0) {
+            $sale->update(['status' => 'BELUM_DIBAYAR']);
+        } elseif ($totalPaid < $sale->total_amount) {
+            $sale->update(['status' => 'BELUM_DIBAYAR_SEPENUHNYA']);
+        } else {
+            $sale->update(['status' => 'SUDAH_DIBAYAR']);
+        }
 
         return redirect()->route('payments.index')
             ->with('success', 'Pembayaran berhasil diupdate');
     }
+
 
     public function destroy(Payment $payment)
     {

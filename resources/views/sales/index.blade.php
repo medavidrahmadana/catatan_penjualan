@@ -7,8 +7,8 @@
         <a href="{{ route('sales.create') }}" class="btn btn-primary">Tambah Penjualan</a>
     </div>
 
-    <table id="salesTable" class="table table-bordered">
-        <thead>
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
             <tr>
                 <th>No</th>
                 <th>Kode</th>
@@ -23,9 +23,17 @@
             <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $sale->sale_code }}</td>
-                <td>{{ $sale->sale_date }}</td>
-                <td>{{ $sale->status }}</td>
-                <td>Rp {{ number_format($sale->total_amount) }}</td>
+                <td>{{ \Carbon\Carbon::parse($sale->sale_date)->format('d M Y') }}
+                </td>
+                <td>@if($sale->status == 'SUDAH_DIBAYAR')
+                    <span class="badge bg-success">SUDAH DIBAYAR</span>
+                    @elseif($sale->status == 'BELUM_DIBAYAR_SEPENUHNYA')
+                    <span class="badge bg-warning text-dark">BELUM DIBAYAR SEBAGIAN</span>
+                    @else
+                    <span class="badge bg-secondary">BELUM DIBAYAR</span>
+                    @endif
+                </td>
+                <td>{{ rupiah($sale->total_amount) }}</td>
                 <td>
                     <a href="{{ route('sales.show',$sale->id) }}" class="btn btn-sm btn-info">Detail</a>
 

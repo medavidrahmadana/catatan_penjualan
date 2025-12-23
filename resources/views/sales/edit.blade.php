@@ -2,12 +2,13 @@
 
 @section('content')
 <div class="container">
-    <h4 class="mb-3">Tambah Penjualan</h4>
+    <h4 class="mb-3">Edit Penjualan</h4>
 
-    <form action="{{ route('sales.store') }}" method="POST">
+    <form action="{{ route('sales.update', $sale->id) }}" method="POST">
         @csrf
+        @method('PUT')
 
-        <table class="table table-bordered" id="itemsTable">
+        <table class="table table-bordered table-hover align-middle">
             <thead class="table-dark">
                 <tr>
                     <th>Item</th>
@@ -19,38 +20,44 @@
             </thead>
 
             <tbody id="itemsBody">
-                <!-- BARIS PERTAMA KOSONG -->
+                @foreach($sale->items as $i => $row)
                 <tr>
                     <td>
-                        <select name="items[0][item_id]" class="form-control item-select">
+                        <select name="items[{{ $i }}][item_id]" class="form-control item-select">
                             <option value="">-- pilih item --</option>
                             @foreach($items as $item)
-                            <option value="{{ $item->id }}" data-price="{{ $item->price }}">
+                            <option value="{{ $item->id }}"
+                                data-price="{{ $item->price }}"
+                                {{ $item->id == $row->item_id ? 'selected' : '' }}>
                                 {{ $item->name }}
                             </option>
                             @endforeach
                         </select>
                     </td>
                     <td>
-                        <input type="number" name="items[0][qty]" class="form-control qty" value="1" min="1">
+                        <input type="number" name="items[{{ $i }}][qty]"
+                            class="form-control qty" value="{{ $row->qty }}" min="1">
                     </td>
                     <td>
-                        <input type="number" name="items[0][price]" class="form-control price" readonly>
+                        <input type="number" name="items[{{ $i }}][price]"
+                            class="form-control price" value="{{ $row->price }}" readonly>
                     </td>
                     <td>
-                        <input type="number" class="form-control subtotal" value="0" readonly>
+                        <input type="number" class="form-control subtotal"
+                            value="{{ $row->total_price }}" readonly>
                     </td>
                     <td>
                         <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
                     </td>
                 </tr>
+                @endforeach
             </tbody>
         </table>
 
         <button type="button"
             class="btn btn-secondary mb-3"
             id="addRow"
-            data-index="1">
+            data-index="{{ $sale->items->count() }}">
             + Tambah Item
         </button>
 
@@ -58,40 +65,38 @@
             <h5>Total: Rp <span id="grandTotal">0</span></h5>
         </div>
 
-        <button class="btn btn-primary">Simpan Penjualan</button>
-        <a href="{{ route('sales.index') }}" class="btn btn-secondary">Kembali</a>
+        <button class="btn btn-primary">Update Penjualan</button>
+        <a href="{{ route('sales.index') }}" class="btn btn-secondary">Batal</a>
     </form>
+    <template id="itemRowTemplate">
+        <tr>
+            <td>
+                <select class="form-control item-select">
+                    <option value="">-- pilih item --</option>
+                    @foreach($items as $item)
+                    <option value="{{ $item->id }}" data-price="{{ $item->price }}">
+                        {{ $item->name }}
+                    </option>
+                    @endforeach
+                </select>
+            </td>
+            <td>
+                <input type="number" class="form-control qty" value="1" min="1">
+            </td>
+            <td>
+                <input type="number" class="form-control price" readonly>
+            </td>
+            <td>
+                <input type="number" class="form-control subtotal" value="0" readonly>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
+            </td>
+        </tr>
+    </template>
+
 </div>
-
-<!-- TEMPLATE ROW -->
-<template id="itemRowTemplate">
-    <tr>
-        <td>
-            <select class="form-control item-select">
-                <option value="">-- pilih item --</option>
-                @foreach($items as $item)
-                <option value="{{ $item->id }}" data-price="{{ $item->price }}">
-                    {{ $item->name }}
-                </option>
-                @endforeach
-            </select>
-        </td>
-        <td>
-            <input type="number" class="form-control qty" value="1" min="1">
-        </td>
-        <td>
-            <input type="number" class="form-control price" readonly>
-        </td>
-        <td>
-            <input type="number" class="form-control subtotal" value="0" readonly>
-        </td>
-        <td>
-            <button type="button" class="btn btn-danger btn-sm remove-row">X</button>
-        </td>
-    </tr>
-</template>
 @endsection
-
 
 @section('scripts')
 <script>

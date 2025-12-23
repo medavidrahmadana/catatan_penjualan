@@ -10,7 +10,7 @@
 
 <body>
 
-    <nav class="navbar navbar-dark bg-dark mb-4">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="{{ route('dashboard') }}">Dashboard</a>
             <a class="nav-link text-white" href="{{ route('sales.index') }}">Penjualan</a>
@@ -18,6 +18,19 @@
         </div>
     </nav>
 
+    <div class="container">
+        @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+        @endif
+    </div>
 
     @yield('content')
 
